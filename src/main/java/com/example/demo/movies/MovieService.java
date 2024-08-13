@@ -3,6 +3,7 @@ package com.example.demo.movies;
 import com.example.demo.movies.tmdb_api.TmdbResponseDTO;
 import com.example.demo.movies.tmdb_api.TmdbService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
