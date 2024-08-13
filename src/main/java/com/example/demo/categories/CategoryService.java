@@ -33,19 +33,12 @@ public class CategoryService {
         Category category = categoryDTOMapper.toEntity(categoryRequestDTO);
         Category toSave = categoryRepository.save(category);
 
-        //return categoryRepository.save(category);
         return categoryDTOMapper.toResponseDTO(toSave);
 
     }
 
     public CategoryResponseDTO deleteCategory(Integer categoryId) {
-//        boolean exists = categoryRepository.existsById(categoryId);
-//
-//        if (!exists) {
-//            throw new IllegalStateException("Category with id" + categoryId + "does not exist");
-//        }
-//
-//        categoryRepository.deleteById(categoryId);
+
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new EntityNotFoundException("Category with id " + categoryId + " not found"));
 
