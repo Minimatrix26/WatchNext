@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+
 import java.util.List;
 import java.util.Optional;
 
@@ -41,13 +42,7 @@ public class MovieService {
 
     public void deleteMovie(Integer movieId) {
 
-//        boolean exists = movieRepository.existsById(movieId);
-//
-//        if (!exists) {
-//            throw new IllegalStateException("Movie with id " + movieId + " does not exist");
-//        }
-//
-//        movieRepository.deleteById(movieId);
+
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new EntityNotFoundException("This movie does not exist"));
 
