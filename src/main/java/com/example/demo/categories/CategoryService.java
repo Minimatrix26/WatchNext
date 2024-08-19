@@ -1,5 +1,6 @@
 package com.example.demo.categories;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,42 +13,58 @@ import java.util.Optional;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryDTOMapper categoryDTOMapper;
 
-    public List<Category> getCategories() {
-        return categoryRepository.findAll();
+    public List<CategoryResponseDTO> getCategories() {
+        return categoryRepository.findAll()
+                .stream()
+                .map(categoryDTOMapper::toResponseDTO)
+                .toList();
     }
 
-    public void addNewCategory(Category category) {
+    public CategoryResponseDTO addNewCategory(CategoryRequestDTO categoryRequestDTO) {
         Optional<Category> categoryOptional = categoryRepository
-                .findCategoryByName(category.getName());
+                .findCategoryByName(categoryRequestDTO.name());
 
         if (categoryOptional.isPresent()) {
             throw new IllegalStateException("This Category name is taken");
         }
-        categoryRepository.save(category);
 
+        Category category = categoryDTOMapper.toEntity(categoryRequestDTO);
+        Category toSave = categoryRepository.save(category);
+
+        //return categoryRepository.save(category);
+        return categoryDTOMapper.toResponseDTO(toSave);
 
     }
 
-    public void deleteCategory(Integer categoryId) {
-        boolean exists = categoryRepository.existsById(categoryId);
+    public CategoryResponseDTO deleteCategory(Integer categoryId) {
+//        boolean exists = categoryRepository.existsById(categoryId);
+//
+//        if (!exists) {
+//            throw new IllegalStateException("Category with id" + categoryId + "does not exist");
+//        }
+//
+//        categoryRepository.deleteById(categoryId);
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new EntityNotFoundException("Category with id " + categoryId + " not found"));
 
-        if (!exists) {
-            throw new IllegalStateException("Category with id" + categoryId + "does not exist");
-        }
+        categoryRepository.delete(category);
 
-        categoryRepository.deleteById(categoryId);
+        return categoryDTOMapper.toResponseDTO(category);
     }
 
     @Transactional
-    public void updateCategory(Integer categoryId, String name) {
+    public CategoryResponseDTO updateCategory(Integer categoryId, CategoryRequestDTO categoryRequestDTO) {
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new IllegalStateException("Category with id" + categoryId + "does not exist"));
+                .orElseThrow(() -> new EntityNotFoundException("Category with id" + categoryId + "does not exist"));
 
-        if (name != null &&
-                !name.isEmpty() &&
-            !category.getName().equals(name)) {
-            category.setName(name);
+        if (categoryRequestDTO.name() != null &&
+                !categoryRequestDTO.name().isEmpty() &&
+            !category.getName().equals(categoryRequestDTO.name()) ) {
+            category.setName(categoryRequestDTO.name());
         }
+
+        return categoryDTOMapper.toResponseDTO(category);
     }
 }
