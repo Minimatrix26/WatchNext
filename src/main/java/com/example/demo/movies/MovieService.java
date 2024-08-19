@@ -1,5 +1,8 @@
 package com.example.demo.movies;
 
+import com.example.demo.categories.CategoryRequestDTO;
+import com.example.demo.categories.CategoryResponseDTO;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,69 +17,85 @@ import java.util.Optional;
 public class MovieService {
 
     private final MovieRepository movieRepository;
+    private final MovieDTOMapper movieDTOMapper;
 
-    public List<Movie> getMovies() {
-        return movieRepository.findAll();
+    public List<MovieResponseDTO> getMovies() {
+        return movieRepository.findAll()
+                .stream()
+                .map(movieDTOMapper::toResponseDTO)
+                .toList();
     }
 
-    public void addNewMovie(Movie movie) {
+    public MovieResponseDTO addNewMovie(MovieRequestDTO movieRequestDTO) {
         Optional<Movie> movieOptional = movieRepository
-                .findMovieByTitle(movie.getTitle());
+                .findMovieByTitle(movieRequestDTO.title());
 
         if (movieOptional.isPresent()) {
             throw new IllegalStateException("This movie already exists");
         }
 
-        movieRepository.save(movie);
+        Movie movie = movieDTOMapper.toEntity(movieRequestDTO);
+        Movie toSave = movieRepository.save(movie);
+
+        //return movieRepository.save(movie);
+        return movieDTOMapper.toResponseDTO(toSave);
+
     }
 
-    public void deleteMovie(Integer movieId) {
+    public MovieResponseDTO deleteMovie(Integer movieId) {
 
-        boolean exists = movieRepository.existsById(movieId);
+//        boolean exists = movieRepository.existsById(movieId);
+//
+//        if (!exists) {
+//            throw new IllegalStateException("Movie with id " + movieId + " does not exist");
+//        }
+//
+//        movieRepository.deleteById(movieId);
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(() -> new EntityNotFoundException("This movie does not exist"));
 
-        if (!exists) {
-            throw new IllegalStateException("Movie with id " + movieId + " does not exist");
-        }
-
-        movieRepository.deleteById(movieId);
+        movieRepository.delete(movie);
+        return movieDTOMapper.toResponseDTO(movie);
     }
 
     @Transactional
-    public void updateMovie(Integer movieId, String title, Integer categoryId, String imdbId, Double imdbScore, String description, LocalDate releaseDate) {
+    public MovieResponseDTO updateMovie(Integer movieId, MovieRequestDTO movieRequestDTO) {
 
         Movie movie = movieRepository.findById(movieId)
-                .orElseThrow(() -> new IllegalStateException("Movie with id " + movieId + " does not exist"));
+                .orElseThrow(() -> new EntityNotFoundException("Movie with id " + movieId + " does not exist"));
 
-        if ( title != null &&
-            !title.isEmpty() &&
-            !title.equals(movie.getTitle()) ) {
-            movie.setTitle(title);
+        if (movieRequestDTO.title() != null &&
+            !movieRequestDTO.title().isEmpty() &&
+            !movieRequestDTO.title().equals(movie.getTitle()) ) {
+            movie.setTitle(movieRequestDTO.title());
         }
 
-        if (categoryId != null && categoryId != movie.getCategoryId()) {
-            movie.setCategoryId(categoryId);
+        if (movieRequestDTO.categoryId() != null && movieRequestDTO.categoryId() != movie.getCategoryId()) {
+            movie.setCategoryId(movieRequestDTO.categoryId());
         }
 
-        if (imdbId != null &&
-            !imdbId.isEmpty() &&
-            !imdbId.equals(movie.getImdbId()) ) {
-            movie.setImdbId(imdbId);
+        if (movieRequestDTO.imdbId() != null &&
+            !movieRequestDTO.imdbId().isEmpty() &&
+            !movieRequestDTO.imdbId().equals(movie.getImdbId()) ) {
+            movie.setImdbId(movieRequestDTO.imdbId());
         }
 
-        if (imdbScore != null &&
-            imdbScore >= 0) {
-            movie.setImdbScore(imdbScore);
+        if (movieRequestDTO.imdbScore() != null &&
+                movieRequestDTO.imdbScore() >= 0) {
+            movie.setImdbScore(movieRequestDTO.imdbScore());
         }
 
-        if (description != null &&
-        !description.isEmpty() &&
-        !description.equals(movie.getDescription())) {
-            movie.setDescription(description);
+        if (movieRequestDTO.description() != null &&
+        !movieRequestDTO.description().isEmpty() &&
+        !movieRequestDTO.description().equals(movie.getDescription())) {
+            movie.setDescription(movieRequestDTO.description());
         }
 
-        if (releaseDate != null) {
-            movie.setReleaseDate(releaseDate);
+        if (movieRequestDTO.releaseDate() != null) {
+            movie.setReleaseDate(movieRequestDTO.releaseDate());
         }
+
+        return movieDTOMapper.toResponseDTO(movie);
 
         //TODO: more accurate logging
     }
