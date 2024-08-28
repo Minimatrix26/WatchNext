@@ -1,6 +1,7 @@
 package com.example.demo.categories;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,12 +20,15 @@ public class CategoryController {
 
     @PostMapping
     public CategoryResponseDTO createNewCategory (@RequestBody CategoryRequestDTO categoryRequestDTO) {
+
         return categoryService.addNewCategory(categoryRequestDTO);
     }
 
     @DeleteMapping (path = "{categoryId}")
-    public CategoryResponseDTO deleteCategory (@PathVariable("categoryId") Integer categoryId) {
-        return categoryService.deleteCategory(categoryId);
+    public ResponseEntity<Void> deleteCategory (@PathVariable("categoryId") Integer categoryId) {
+
+        categoryService.deleteCategory(categoryId);
+        return ResponseEntity.noContent().build(); // Return code 204 (no content)
     }
 
     @PutMapping (path = "{categoryId}")

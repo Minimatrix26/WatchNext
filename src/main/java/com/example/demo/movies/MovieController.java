@@ -2,6 +2,7 @@ package com.example.demo.movies;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,8 +25,9 @@ public class MovieController {
     }
 
     @DeleteMapping (path = "{movieId}")
-    public MovieResponseDTO deleteMovie(@PathVariable("movieId") Integer movieId) {
-        return movieService.deleteMovie(movieId);
+    public ResponseEntity<Void> deleteMovie(@PathVariable("movieId") Integer movieId) {
+        movieService.deleteMovie(movieId);
+        return ResponseEntity.noContent().build(); // Response code 204 (no content response)
     }
 
     @PutMapping (path = "{movieId}")

@@ -1,13 +1,10 @@
 package com.example.demo.movies;
 
-import com.example.demo.categories.CategoryRequestDTO;
-import com.example.demo.categories.CategoryResponseDTO;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,7 +39,7 @@ public class MovieService {
 
     }
 
-    public MovieResponseDTO deleteMovie(Integer movieId) {
+    public void deleteMovie(Integer movieId) {
 
 //        boolean exists = movieRepository.existsById(movieId);
 //
@@ -55,7 +52,7 @@ public class MovieService {
                 .orElseThrow(() -> new EntityNotFoundException("This movie does not exist"));
 
         movieRepository.delete(movie);
-        return movieDTOMapper.toResponseDTO(movie);
+        // No content response
     }
 
     @Transactional

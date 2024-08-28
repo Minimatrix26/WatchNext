@@ -38,7 +38,7 @@ public class CategoryService {
 
     }
 
-    public CategoryResponseDTO deleteCategory(Integer categoryId) {
+    public void deleteCategory(Integer categoryId) {
 //        boolean exists = categoryRepository.existsById(categoryId);
 //
 //        if (!exists) {
@@ -51,7 +51,7 @@ public class CategoryService {
 
         categoryRepository.delete(category);
 
-        return categoryDTOMapper.toResponseDTO(category);
+        // No need to return anything, just response code 204
     }
 
     @Transactional

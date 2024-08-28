@@ -1,0 +1,1 @@
+ALTER TABLE confirmation_tokens ALTER COLUMN confirmedAt DROP NOT NULL;
