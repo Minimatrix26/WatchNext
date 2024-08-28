@@ -38,13 +38,14 @@ public class CategoryService {
 
     }
 
-    public void deleteCategory(Integer categoryId) {
+    public CategoryResponseDTO deleteCategory(Integer categoryId) {
 
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new EntityNotFoundException("Category with id " + categoryId + " not found"));
 
         categoryRepository.delete(category);
 
+        return categoryDTOMapper.toResponseDTO(category);
     }
 
     @Transactional

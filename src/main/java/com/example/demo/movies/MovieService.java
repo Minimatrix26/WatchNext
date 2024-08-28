@@ -40,14 +40,14 @@ public class MovieService {
 
     }
 
-    public void deleteMovie(Integer movieId) {
+    public MovieResponseDTO deleteMovie(Integer movieId) {
 
 
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new EntityNotFoundException("This movie does not exist"));
 
         movieRepository.delete(movie);
-        // No content response
+        return movieDTOMapper.toResponseDTO(movie);
     }
 
     @Transactional
