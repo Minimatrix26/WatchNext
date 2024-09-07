@@ -1,6 +1,7 @@
 package com.example.demo.categories;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,21 +14,25 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public List<CategoryResponseDTO> getAllCategories () {
         return categoryService.getCategories();
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public CategoryResponseDTO createNewCategory (@RequestBody CategoryRequestDTO categoryRequestDTO) {
         return categoryService.addNewCategory(categoryRequestDTO);
     }
 
     @DeleteMapping (path = "{categoryId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public CategoryResponseDTO deleteCategory (@PathVariable("categoryId") Integer categoryId) {
         return categoryService.deleteCategory(categoryId);
     }
 
     @PutMapping (path = "{categoryId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public CategoryResponseDTO updateCategory (@PathVariable("categoryId") Integer categoryId, @RequestBody CategoryRequestDTO categoryRequestDTO) {
         return categoryService.updateCategory(categoryId, categoryRequestDTO);
     }
