@@ -2,7 +2,6 @@ package com.example.demo.movies.tmdb_api;
 
 import com.example.demo.movies.MovieRequestDTO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -10,8 +9,7 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class TmdbService {
 
-    @Value("${tmdb.api.key}")
-    private String apiKey;
+    private final String apiKey = System.getenv("TMDB_API_KEY");
     private final RestTemplate restTemplate;
 
     private TMDBPartialResponse fetchInternalMovieId(String movieTitle) {
@@ -21,10 +19,6 @@ public class TmdbService {
     }
 
     public TmdbResponseDTO getDetailsFromApi(MovieRequestDTO movieRequestDTO) {
-        //        int internalMovieId = fetchInternalMovieId(movieRequestDTO.title()).id();
-//
-//       String api_url = "https://api.themoviedb.org/3/movie/" + internalMovieId + "?api_key=" + apiKey;
-//       return restTemplate.getForObject(api_url, TmdbResponseDTO.class);
 
         TMDBPartialResponse searchResponse = fetchInternalMovieId(movieRequestDTO.title());
         if (searchResponse == null || searchResponse.results().isEmpty()) {

@@ -1,7 +1,5 @@
 package com.example.demo.movies;
 
-import com.example.demo.categories.CategoryRequestDTO;
-import com.example.demo.categories.CategoryResponseDTO;
 import com.example.demo.movies.tmdb_api.TmdbResponseDTO;
 import com.example.demo.movies.tmdb_api.TmdbService;
 import jakarta.persistence.EntityNotFoundException;
@@ -53,13 +51,6 @@ public class MovieService {
 
     public MovieResponseDTO deleteMovie(Integer movieId) {
 
-//        boolean exists = movieRepository.existsById(movieId);
-//
-//        if (!exists) {
-//            throw new IllegalStateException("Movie with id " + movieId + " does not exist");
-//        }
-//
-//        movieRepository.deleteById(movieId);
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new EntityNotFoundException("This movie does not exist"));
 
