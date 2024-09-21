@@ -5,6 +5,9 @@ import com.example.demo.movies.tmdb_api.TmdbService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -97,5 +100,14 @@ public class MovieService {
         return movieDTOMapper.toResponseDTO(movie);
 
         //TODO: more accurate logging
+    }
+
+    public List<MovieResponseDTO> findMoviesByQuery(int limit, LocalDate from, LocalDate to) {
+        Pageable pageable = PageRequest.of(0, limit);
+        Page<Movie> movies = movieRepository.findMoviesByReleaseDateRange(from, to, pageable);
+
+        return movies.stream()
+                .map(movieDTOMapper::toResponseDTO)
+                .toList();
     }
 }
