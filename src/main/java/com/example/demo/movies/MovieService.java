@@ -1,11 +1,13 @@
 package com.example.demo.movies;
 
-import com.example.demo.categories.CategoryRequestDTO;
-import com.example.demo.categories.CategoryResponseDTO;
-import jakarta.persistence.EntityNotFoundException;
+import com.example.demo.movies.tmdb_api.TmdbResponseDTO;
+import com.example.demo.movies.tmdb_api.TmdbService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,6 +21,7 @@ public class MovieService {
 
     private final MovieRepository movieRepository;
     private final MovieDTOMapper movieDTOMapper;
+    private final TmdbService tmdbService;
 
     public List<MovieResponseDTO> getMovies() {
         return movieRepository.findAll()
@@ -36,22 +39,20 @@ public class MovieService {
         }
 
         Movie movie = movieDTOMapper.toEntity(movieRequestDTO);
+        TmdbResponseDTO tmdbResponseDTO = tmdbService.getDetailsFromApi(movieRequestDTO);
+        movie.setImdbId(tmdbResponseDTO.imdb_id());
+        movie.setImdbScore(tmdbResponseDTO.vote_average());
+        movie.setReleaseDate(LocalDate.parse(tmdbResponseDTO.release_date()));
+        movie.setDescription(tmdbResponseDTO.overview());
+
         Movie toSave = movieRepository.save(movie);
 
-        //return movieRepository.save(movie);
         return movieDTOMapper.toResponseDTO(toSave);
 
     }
 
     public MovieResponseDTO deleteMovie(Integer movieId) {
 
-//        boolean exists = movieRepository.existsById(movieId);
-//
-//        if (!exists) {
-//            throw new IllegalStateException("Movie with id " + movieId + " does not exist");
-//        }
-//
-//        movieRepository.deleteById(movieId);
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new EntityNotFoundException("This movie does not exist"));
 
@@ -99,5 +100,14 @@ public class MovieService {
         return movieDTOMapper.toResponseDTO(movie);
 
         //TODO: more accurate logging
+    }
+
+    public List<MovieResponseDTO> findMoviesByQuery(int limit, LocalDate from, LocalDate to) {
+        Pageable pageable = PageRequest.of(0, limit);
+        Page<Movie> movies = movieRepository.findMoviesByReleaseDateRange(from, to, pageable);
+
+        return movies.stream()
+                .map(movieDTOMapper::toResponseDTO)
+                .toList();
     }
 }
