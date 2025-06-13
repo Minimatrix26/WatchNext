@@ -1,6 +1,8 @@
 package com.example.demo.movies;
 
 
+import com.example.demo.movies.tmdb_api.PosterPathDTO;
+import com.example.demo.movies.tmdb_api.TmdbService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -11,17 +13,38 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping (path = "api/v1/movies")
 @RequiredArgsConstructor
 public class MovieController {
 
     private final MovieService movieService;
+    private final TmdbService tmdbService;
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public List<MovieResponseDTO> getMovies() {
         return movieService.getMovies();
+    }
+
+    @GetMapping(path = "{id}")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    public MovieResponseDTO getMovie(@PathVariable Integer id) {
+        return movieService.getMovie(id);
+    }
+
+    @GetMapping(path = "/search-by-title")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    public List<MovieResponseDTO> getMoviesByTitle(@RequestParam String title) {
+        return movieService.searchByTitleContaining(title);
+    }
+
+    @GetMapping(path = "/poster")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    public ResponseEntity<PosterPathDTO> getPosterPath(@RequestParam String title) {
+        PosterPathDTO dto = tmdbService.getPosterDTOByTitle(title);
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping

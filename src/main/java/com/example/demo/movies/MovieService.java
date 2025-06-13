@@ -30,6 +30,12 @@ public class MovieService {
                 .toList();
     }
 
+    public MovieResponseDTO getMovie(Integer id) {
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("This movie does not exist"));
+        return movieDTOMapper.toResponseDTO(movie);
+    }
+
     public MovieResponseDTO addNewMovie(MovieRequestDTO movieRequestDTO) {
         Optional<Movie> movieOptional = movieRepository
                 .findMovieByTitle(movieRequestDTO.title());
@@ -58,6 +64,13 @@ public class MovieService {
 
         movieRepository.delete(movie);
         return movieDTOMapper.toResponseDTO(movie);
+    }
+
+    public List<MovieResponseDTO> searchByTitleContaining(String title) {
+        return movieRepository.findByTitleIgnoreCase(title)
+                .stream()
+                .map(movieDTOMapper::toResponseDTO)
+                .toList();
     }
 
     @Transactional

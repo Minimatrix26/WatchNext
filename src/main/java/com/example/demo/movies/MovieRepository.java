@@ -20,4 +20,7 @@ public interface MovieRepository extends JpaRepository<Movie, Integer> {
             "(m.releaseDate <= ?2) " +
             "ORDER BY m.releaseDate ASC")
     Page<Movie> findMoviesByReleaseDateRange(LocalDate from, LocalDate to, Pageable pageable);
+
+    Optional<Movie> findByTitleIgnoreCase(String title);
+
 }
