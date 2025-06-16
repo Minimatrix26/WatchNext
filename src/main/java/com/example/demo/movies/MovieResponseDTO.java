@@ -6,6 +6,7 @@ public record MovieResponseDTO(
         Integer id,
         String title,
         Integer categoryId,
+        String categoryName, // pt a afisa numele categoriei
         String imdbId,
         Double imdbScore,
         String description,
