@@ -123,4 +123,11 @@ public class MovieService {
                 .map(movieDTOMapper::toResponseDTO)
                 .toList();
     }
+
+    public Page<MovieResponseDTO> getMoviesByCategory(Integer categoryId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return movieRepository.findAllByCategoryId(categoryId, pageable)
+                .map(movieDTOMapper::toResponseDTO);
+    }
+
 }

@@ -4,6 +4,7 @@ package com.example.demo.movies;
 import com.example.demo.movies.tmdb_api.PosterPathDTO;
 import com.example.demo.movies.tmdb_api.TmdbService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -76,4 +77,15 @@ public class MovieController {
         List<MovieResponseDTO> movies = movieService.findMoviesByQuery(limit, from, to);
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
+
+    @GetMapping("/by-category")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    public ResponseEntity<Page<MovieResponseDTO>> getMoviesByCategory(
+            @RequestParam Integer categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size
+    ) {
+        return ResponseEntity.ok(movieService.getMoviesByCategory(categoryId, page, size));
+    }
+
 }
