@@ -3,8 +3,9 @@ package com.example.demo.user;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,12 +13,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@Data
+// 1. Replaced @Data with @Getter and @Setter to fix the Cyclomatic Complexity
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table (name = "users_v2")
+@Table(name = "users_v2")
 public class User implements UserDetails {
 
     @Id
@@ -31,13 +34,14 @@ public class User implements UserDetails {
             generator = "users_v2_id_seq"
     )
     private Integer id;
+
     private String firstname;
     private String lastname;
     private String email;
     private String password;
+
     @Enumerated(EnumType.STRING)
     private Role role;
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -54,27 +58,24 @@ public class User implements UserDetails {
         return email;
     }
 
+    // 2. Removed the commented-out super calls to fix the Intentionality issues
     @Override
     public boolean isAccountNonExpired() {
         return true;
-        //return UserDetails.super.isAccountNonExpired();
     }
 
     @Override
     public boolean isAccountNonLocked() {
         return true;
-        //return UserDetails.super.isAccountNonLocked();
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
-        //return UserDetails.super.isCredentialsNonExpired();
     }
 
     @Override
     public boolean isEnabled() {
         return true;
-        //return UserDetails.super.isEnabled();
     }
 }

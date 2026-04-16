@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:4200")
+// 1. Replaced the hardcoded URL with an injected property
+@CrossOrigin(origins = "${frontend.allowed.origin}")
 @RestController
 @RequestMapping(path = "api/v1/wishlist")
 @RequiredArgsConstructor
@@ -24,14 +25,16 @@ public class WishlistController {
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-    public ResponseEntity<?> addToWishlist(@RequestBody WishlistRequest request) {
+    // 2. Replaced <?> with <Void> to explicitly show no body is returned
+    public ResponseEntity<Void> addToWishlist(@RequestBody WishlistRequest request) {
         wishlistService.addToWishlist(request.movieId());
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping(path = "{movieId}")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-    public ResponseEntity<?> removeFromWishlist(@PathVariable("movieId") Integer movieId) {
+    // 3. Replaced <?> with <Void> to explicitly show no body is returned
+    public ResponseEntity<Void> removeFromWishlist(@PathVariable("movieId") Integer movieId) {
         wishlistService.removeFromWishlist(movieId);
         return ResponseEntity.ok().build();
     }

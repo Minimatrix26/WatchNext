@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "${frontend.allowed.origin}")
 @RestController
 @RequestMapping(path = "api/v1/reviews")
 @RequiredArgsConstructor
@@ -17,7 +17,8 @@ public class ReviewController {
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-    public ResponseEntity<?> addReview(@RequestBody ReviewRequest request) {
+    // Fix: Replaced <?> with <Void> to explicitly show no body is returned
+    public ResponseEntity<Void> addReview(@RequestBody ReviewRequest request) {
         reviewService.addReview(request);
         return ResponseEntity.ok().build();
     }
