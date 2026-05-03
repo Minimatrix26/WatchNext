@@ -8,31 +8,35 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = WishlistController.FRONTEND_URL)
 @RestController
 @RequestMapping(path = "api/v1/wishlist")
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
 public class WishlistController {
+
+    static final String FRONTEND_URL = "http://localhost:4200";
 
     private final WishlistService wishlistService;
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public ResponseEntity<List<MovieResponseDTO>> getWishlist() {
         return ResponseEntity.ok(wishlistService.getUserWishlist());
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-    public ResponseEntity<?> addToWishlist(@RequestBody WishlistRequest request) {
+    public ResponseEntity<Void> addToWishlist(@RequestBody WishlistRequest request) {
         wishlistService.addToWishlist(request.movieId());
-        return ResponseEntity.ok().build();
+        return buildOkResponse();
     }
 
-    @DeleteMapping(path = "{movieId}")
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-    public ResponseEntity<?> removeFromWishlist(@PathVariable("movieId") Integer movieId) {
+    @DeleteMapping("/{movieId}")
+    public ResponseEntity<Void> removeFromWishlist(@PathVariable Integer movieId) {
         wishlistService.removeFromWishlist(movieId);
+        return buildOkResponse();
+    }
+
+    private ResponseEntity<Void> buildOkResponse() {
         return ResponseEntity.ok().build();
     }
 }
